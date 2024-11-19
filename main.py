@@ -1,19 +1,18 @@
 from flask import Flask, request, render_template
-import io
 import PyPDF2
 
 app = Flask(__name__)
 
 
-def search_pdfs(files, keyword):
+def search_pdfs(files_with_names, keyword):
     results = []
-    for file in files:
-        file.seek(0)  # Reset file pointer to the beginning
-        reader = PyPDF2.PdfReader(file)
+    for file_stream, filename in files_with_names:
+        file_stream.seek(0)  # Reset the file pointer to the beginning
+        reader = PyPDF2.PdfReader(file_stream)
         for i, page in enumerate(reader.pages):
             text = page.extract_text()
             if keyword.lower() in text.lower():
-                results.append(f"Found '{keyword}' in {file.filename}, page {i + 1}")
+                results.append(f"Found '{keyword}' in {filename}, page {i + 1}")
     return results
 
 
@@ -25,11 +24,11 @@ def index():
 
         uploaded_files = request.files.getlist("pdf_file")  # Get the uploaded files
         if uploaded_files:
-            # In-memory processing without saving to disk
-            files = [file.stream for file in uploaded_files]  # In-memory file object (stream)
+            # Create a list of tuples containing file streams and their filenames
+            files_with_names = [(file.stream, file.filename) for file in uploaded_files]
 
             # Search through the uploaded files
-            results = search_pdfs(files, keyword)
+            results = search_pdfs(files_with_names, keyword)
         else:
             results.append("No files uploaded.")
 
