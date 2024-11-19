@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>PDF Search App</h1>
+    <form method="POST">
+        <label>Folder Path:</label><br>
+        <input type="text" name="folder" required><br><br>
+        <label>Keyword:</label><br>
+        <input type="text" name="keyword" required><br><br>
+        <button type="submit">Search</button>
+    </form>
+    <h2>Results:</h2>
+    <ul>
+        {% for result in results %}
+            <li>{{ result }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
