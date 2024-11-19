@@ -7,12 +7,15 @@ app = Flask(__name__)
 def search_pdfs(files_with_names, keyword):
     results = []
     for file_stream, filename in files_with_names:
-        file_stream.seek(0)  # Reset the file pointer to the beginning
-        reader = PyPDF2.PdfReader(file_stream)
-        for i, page in enumerate(reader.pages):
-            text = page.extract_text()
-            if keyword.lower() in text.lower():
-                results.append(f"Found '{keyword}' in {filename}, page {i + 1}")
+        try:
+            file_stream.seek(0)  # Reset the file pointer to the start
+            reader = PyPDF2.PdfReader(file_stream)
+            for i, page in enumerate(reader.pages):
+                text = page.extract_text()
+                if text and keyword.lower() in text.lower():
+                    results.append(f"Found '{keyword}' in {filename}, page {i + 1}")
+        except Exception as e:
+            results.append(f"Error reading {filename}: {str(e)}")
     return results
 
 
